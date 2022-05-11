@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
    <modules>
-      <modulename></modulename>
+      <modulename>core</modulename>
       <version></version>
    </modules>
    <modules>
       <modulename></modulename>
       <version></version>
    </modules>
-   <root></root>
-   <version></version>
+   <root>C:\Users\Leonardo\gitRepositories\intesa\aem65-gdi</root>
+   <version>3.7.127</version>
 </settings>

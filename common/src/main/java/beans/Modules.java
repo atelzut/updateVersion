@@ -28,4 +28,11 @@ public class Modules {
         this.version = version;
     }
 
+    @Override
+    public String toString() {
+        return "Modules{" +
+                "modulename='" + modulename + '\'' +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

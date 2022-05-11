@@ -26,7 +26,7 @@ public class XmlHelperImpl implements XmlHelper {
     @Override
     public Settings fromXmlToJava(String path, String filename) throws JAXBException {
         JAXBContext contextObj = org.eclipse.persistence.jaxb.JAXBContextFactory.createContext(new Class[] {Settings.class}, null);
-       File inputFile = new File("filename");
+       File inputFile = new File(path+"\\"+filename);
         Unmarshaller jaxbUnmarshaller = contextObj.createUnmarshaller();
         return (Settings) jaxbUnmarshaller.unmarshal(inputFile);
     }

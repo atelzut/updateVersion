@@ -23,6 +23,12 @@ public class Main {
             }
         }
 
+        try {
+            filesHelper.updateVersion();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }
