@@ -16,7 +16,7 @@ public class Main {
     {FilesHelper filesHelper = new FileHelperImpl();
         if (!filesHelper.checkSettings()) {
             try {
-                filesHelper.genereteSttings();
+                filesHelper.genereteSettings();
             } catch ( FileNotFoundException | JAXBException e) {
                 e.printStackTrace();
                 LOG.info(e.getMessage());

@@ -7,6 +7,6 @@ import java.io.FileNotFoundException;
 public interface FilesHelper {
 
     public boolean checkSettings();
-    public void genereteSttings() throws  FileNotFoundException, JAXBException;
+    public void genereteSettings() throws  FileNotFoundException, JAXBException;
 
 }

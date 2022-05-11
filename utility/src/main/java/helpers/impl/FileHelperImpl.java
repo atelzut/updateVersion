@@ -16,11 +16,11 @@ public class FileHelperImpl implements FilesHelper {
     }
 
     @Override
-    public void genereteSttings() throws JAXBException, FileNotFoundException {
+    public void genereteSettings() throws JAXBException, FileNotFoundException {
 
         Settings settings = new Settings();
         settings.createTemplate();
         XmlHelper xmlHelper= new XmlHelperImpl();
-        xmlHelper.fromJavaToXml(settings, System.getProperty("user.dir"), "settings.xml");
+        xmlHelper.fromJavaToXml(settings, System.getProperty("user.dir"), "settings.xml",Settings.class);
     }
 }
