@@ -3,9 +3,13 @@ package helpers;
 import helpers.impl.FileHelperImpl;
 import jakarta.xml.bind.JAXBException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
+import java.io.IOException;
 import java.util.logging.Logger;
+
+import static constants.Constants.*;
 
 public class Main {
 
@@ -24,8 +28,10 @@ public class Main {
         }
 
         try {
-            filesHelper.updateVersion();
-        } catch (JAXBException e) {
+            LOG.info("file list");
+            filesHelper.updateVersion(CURRENT_ROOT, SETTINGS_XML, PACKAGE_INFO);
+
+        } catch (JAXBException | IOException e) {
             e.printStackTrace();
         }
 
