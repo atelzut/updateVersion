@@ -18,19 +18,19 @@ import static constants.Constants.PATH_SEPARATOR;
 public class XmlHelperImpl implements XmlHelper {
     @Override
     public void fromJavaToXml(Object obj, String path, String filename, Class<Settings> objectClass) throws JAXBException, FileNotFoundException {
-        JAXBContext contextObj = org.eclipse.persistence.jaxb.JAXBContextFactory.createContext(new Class[] {objectClass}, null);
+        JAXBContext contextObj = org.eclipse.persistence.jaxb.JAXBContextFactory.createContext(new Class[]{objectClass}, null);
 
         Marshaller marshallerObj = contextObj.createMarshaller();
         marshallerObj.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshallerObj.marshal(obj, new FileOutputStream(path+PATH_SEPARATOR+filename));
+        marshallerObj.marshal(obj, new FileOutputStream(path + PATH_SEPARATOR + filename));
 
 
     }
 
     @Override
     public Settings fromXmlToJava(String path, String filename) throws JAXBException {
-        JAXBContext contextObj = org.eclipse.persistence.jaxb.JAXBContextFactory.createContext(new Class[] {Settings.class}, null);
-       File inputFile = new File(path+PATH_SEPARATOR+filename);
+        JAXBContext contextObj = org.eclipse.persistence.jaxb.JAXBContextFactory.createContext(new Class[]{Settings.class}, null);
+        File inputFile = new File(path + PATH_SEPARATOR + filename);
         Unmarshaller jaxbUnmarshaller = contextObj.createUnmarshaller();
         return (Settings) jaxbUnmarshaller.unmarshal(inputFile);
     }
@@ -44,14 +44,13 @@ public class XmlHelperImpl implements XmlHelper {
 
 //Editing
         String[] versionArray = version.split("\\.");
-        model.getProperties().setProperty("UDC.BUILD.VERSION",versionArray[0].concat(".${RELEASE}"));
-        model.getProperties().setProperty("RELEASE",versionArray[1]);
-        model.getProperties().setProperty("UDC.BUILD.NUMBER",versionArray[2]);
+        model.getProperties().setProperty("UDC.BUILD.VERSION", versionArray[0].concat(".${RELEASE}"));
+        model.getProperties().setProperty("RELEASE", versionArray[1]);
+        model.getProperties().setProperty("UDC.BUILD.NUMBER", versionArray[2]);
 
 //Writing
         MavenXpp3Writer writer = new MavenXpp3Writer();
         writer.write(new FileOutputStream(new File(baseDir, "/pom.xml")), model);
     }
-
 
 }

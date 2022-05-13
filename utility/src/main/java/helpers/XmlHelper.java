@@ -13,5 +13,5 @@ public interface XmlHelper {
 
     Settings fromXmlToJava(String path, String filename) throws JAXBException;
 
-    void pomModifier(String basedir,String version) throws IOException, XmlPullParserException;
+    void pomModifier(String basedir, String version) throws IOException, XmlPullParserException;
 }

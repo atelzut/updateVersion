@@ -48,8 +48,73 @@ public class FileServiceImpl implements FilesService {
                     modifyVersion(StringUtils.isNotEmpty(module.getVersion()) ? module.getVersion() : settings.getVersion(), file);
                 }
         }
+        modifyPom(settings.getRoot(), settings.getVersion());
+    }
 
-        //xmlHelper.pomModifier(settings.getRoot(),settings.getVersion());
+    private void modifyPom(String root, String version) {
+        BufferedReader reader = null;
+        FileWriter writer = null;
+        try {
+            final File file = new File(root + PATH_SEPARATOR + "pom.xml");
+            reader = new BufferedReader(new FileReader(file));
+            String line = reader.readLine();
+            String[] versionArray = version.split("\\.");
+            StringBuilder oldContent = new StringBuilder();
+            while (line != null) {
+
+                oldContent.append(updatePomVersion(line, versionArray));
+                line = reader.readLine();
+                if (line != null) {
+                    oldContent.append(System.lineSeparator());
+                }
+
+            }
+            writer = new FileWriter(file);
+            writer.write(String.valueOf(oldContent));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                //Closing the resources
+                if (reader != null) reader.close();
+                if (writer != null) writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private String updatePomVersion(String line, String[] versionArray) {
+        String stringToReplace;
+        String[] replacer;
+        final String UDC_BUILD_NUMBER = "<UDC.BUILD.NUMBER>";
+        final String RELEASE = "<RELEASE>";
+        final String UDC_BUILD_VERSION = "<UDC.BUILD.VERSION>";
+        int position;
+        String versionSection;
+
+        if (line.contains(UDC_BUILD_NUMBER)) {
+            versionSection = UDC_BUILD_NUMBER;
+            position = 2;
+        } else if (line.contains(RELEASE)) {
+            versionSection = RELEASE;
+            position = 1;
+        } else if (line.contains(UDC_BUILD_VERSION)) {
+            versionSection = UDC_BUILD_VERSION;
+            position = 0;
+        } else {
+            return line;
+        }
+
+        int start = StringUtils.indexOf(line, versionSection) + versionSection.length();
+        int end = StringUtils.indexOf(line, "</");
+        stringToReplace = line.substring(start, end);
+        replacer = line.substring(start, end).split("\\.");
+        replacer[0]=versionArray[position];
+        line = line.replace(stringToReplace,String.join(".",replacer ));
+
+        return line;
     }
 
     @Override
@@ -83,7 +148,7 @@ public class FileServiceImpl implements FilesService {
 
                 oldContent = oldContent.concat(line);
                 line = reader.readLine();
-                if (line !=null) {
+                if (line != null) {
                     oldContent = oldContent.concat(System.lineSeparator());
                 }
             }
@@ -94,11 +159,13 @@ public class FileServiceImpl implements FilesService {
         } finally {
             try {
                 //Closing the resources
-                reader.close();
-                writer.close();
+                if (reader != null) reader.close();
+                if (writer != null) writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+
 }
