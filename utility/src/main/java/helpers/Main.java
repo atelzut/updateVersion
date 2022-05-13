@@ -1,9 +1,10 @@
 package helpers;
 
-import helpers.impl.FileHelperImpl;
 import jakarta.xml.bind.JAXBException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import services.FilesService;
+import services.impl.FileServiceImpl;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 
 import java.io.IOException;
@@ -17,10 +18,11 @@ public class Main {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args)
-    {FilesHelper filesHelper = new FileHelperImpl();
-        if (!filesHelper.checkSettings()) {
+    {
+        FilesService FilesService = new FileServiceImpl();
+        if (!FilesService.checkSettings()) {
             try {
-                filesHelper.genereteSettings();
+                FilesService.genereteSettings();
             } catch ( FileNotFoundException | JAXBException e) {
                 e.printStackTrace();
                 LOG.info(e.getMessage());
@@ -28,8 +30,11 @@ public class Main {
         }
 
         try {
-            LOG.info("file list");
-            filesHelper.updateVersion(CURRENT_ROOT, SETTINGS_XML, PACKAGE_INFO);
+            try {
+                FilesService.updateVersion(CURRENT_ROOT, SETTINGS_XML, PACKAGE_INFO);
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
 
         } catch (JAXBException | IOException e) {
             e.printStackTrace();

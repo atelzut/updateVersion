@@ -1,9 +1,9 @@
-package helpers.impl;
+package services.impl;
 
 import beans.Modules;
 import beans.Settings;
-import helpers.FilesHelper;
 import helpers.XmlHelper;
+import helpers.impl.XmlHelperImpl;
 import jakarta.xml.bind.JAXBException;
 
 import java.io.*;
@@ -11,14 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import constants.*;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import services.FilesService;
 
 import static constants.Constants.*;
 
-public class FileHelperImpl implements FilesHelper {
+public class FileServiceImpl implements FilesService {
 
-    private static final Logger LOG = Logger.getLogger(FileHelperImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(FileServiceImpl.class.getName());
     private static final String VERSION_STRING = "@Version(\"";
 
     @Override
@@ -37,16 +38,18 @@ public class FileHelperImpl implements FilesHelper {
     }
 
     @Override
-    public void updateVersion(String path, String fileSetting, String fileToUpdate) throws JAXBException, IOException {
+    public void updateVersion(String path, String fileSetting, String fileToUpdate) throws JAXBException, IOException, XmlPullParserException {
 
         XmlHelper xmlHelper = new XmlHelperImpl();
-        Settings settings = xmlHelper.fromXmlToJava(CURRENT_ROOT, SETTINGS_XML);
+        Settings settings = xmlHelper.fromXmlToJava(path, fileSetting);
         for (Modules module : settings.getModules()) {
             if (StringUtils.isNotEmpty(module.getModulename()))
-                for (File file : searchFiles(settings.getRoot() + PATH_SEPARATOR + module.getModulename(), PACKAGE_INFO)) {
+                for (File file : searchFiles(settings.getRoot() + PATH_SEPARATOR + module.getModulename(), fileToUpdate)) {
                     modifyVersion(StringUtils.isNotEmpty(module.getVersion()) ? module.getVersion() : settings.getVersion(), file);
                 }
         }
+
+        //xmlHelper.pomModifier(settings.getRoot(),settings.getVersion());
     }
 
     @Override
@@ -66,7 +69,7 @@ public class FileHelperImpl implements FilesHelper {
     }
 
     public void modifyVersion(String version, File file) {
-        BufferedReader reader =null;
+        BufferedReader reader = null;
         FileWriter writer = null;
         try {
             reader = new BufferedReader(new FileReader(file));
@@ -75,11 +78,14 @@ public class FileHelperImpl implements FilesHelper {
             while (line != null) {
                 if (line.contains(VERSION_STRING)) {
                     String stringToReplace = line.substring(VERSION_STRING.length(), line.indexOf("\")"));
-                    line= line.replace(stringToReplace, version);
+                    line = line.replace(stringToReplace, version);
                 }
 
-                oldContent = oldContent.concat(line).concat(System.lineSeparator());
+                oldContent = oldContent.concat(line);
                 line = reader.readLine();
+                if (line !=null) {
+                    oldContent = oldContent.concat(System.lineSeparator());
+                }
             }
             writer = new FileWriter(file);
             writer.write(oldContent);
