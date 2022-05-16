@@ -20,7 +20,6 @@ import static constants.Constants.*;
 public class FileServiceImpl implements FilesService {
 
     private static final Logger LOG = Logger.getLogger(FileServiceImpl.class.getName());
-    private static final String VERSION_STRING = "@Version(\"";
 
     @Override
     public boolean checkSettings() {
@@ -42,50 +41,52 @@ public class FileServiceImpl implements FilesService {
 
         XmlHelper xmlHelper = new XmlHelperImpl();
         Settings settings = xmlHelper.fromXmlToJava(path, fileSetting);
+        final File parentPom = new File(settings.getRoot() + PATH_SEPARATOR + "pom.xml");
         for (Modules module : settings.getModules()) {
             if (StringUtils.isNotEmpty(module.getModulename()))
                 for (File file : searchFiles(settings.getRoot() + PATH_SEPARATOR + module.getModulename(), fileToUpdate)) {
-                    modifyVersion(StringUtils.isNotEmpty(module.getVersion()) ? module.getVersion() : settings.getVersion(), file);
+                    modifyVersion(StringUtils.isNotEmpty(module.getVersion()) ? module.getVersion() : settings.getVersion(), file, Boolean.FALSE);
                 }
         }
-        modifyPom(settings.getRoot(), settings.getVersion());
+        modifyVersion(settings.getVersion(), parentPom, Boolean.TRUE);
     }
 
-    private void modifyPom(String root, String version) {
-        BufferedReader reader = null;
-        FileWriter writer = null;
-        try {
-            final File file = new File(root + PATH_SEPARATOR + "pom.xml");
-            reader = new BufferedReader(new FileReader(file));
-            String line = reader.readLine();
-            String[] versionArray = version.split("\\.");
-            StringBuilder oldContent = new StringBuilder();
-            while (line != null) {
+    public void modifyVersion(String version, File file, boolean isParentPom) {
 
-                oldContent.append(updatePomVersion(line, versionArray));
+        try (BufferedReader reader = new BufferedReader(new FileReader(file));) {
+            String line = reader.readLine();
+            String versionUpdated = "";
+            String[] versionArray = version.split("\\.");
+            while (line != null) {
+                versionUpdated = versionUpdated.concat(isParentPom ? pomVersionUpdater(line, versionArray) : packageInfoUpdeter(version, line));
                 line = reader.readLine();
                 if (line != null) {
-                    oldContent.append(System.lineSeparator());
+                    versionUpdated = versionUpdated.concat(System.lineSeparator());
                 }
-
             }
-            writer = new FileWriter(file);
-            writer.write(String.valueOf(oldContent));
+            writeToFile(file, versionUpdated);
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                //Closing the resources
-                if (reader != null) reader.close();
-                if (writer != null) writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            LOG.info("error: "+ e.getMessage());
         }
     }
 
-    private String updatePomVersion(String line, String[] versionArray) {
+    private String packageInfoUpdeter(String version, String line) {
+        final String VERSION_STRING = "@Version(\"";
+        if (line.contains(VERSION_STRING)) {
+            String stringToReplace = line.substring(VERSION_STRING.length(), line.indexOf("\")"));
+            line = line.replace(stringToReplace, version);
+        }
+        return line;
+    }
+
+
+    private void writeToFile(File file, String fileUpdated) throws IOException {
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(fileUpdated);
+        }
+    }
+
+    private String pomVersionUpdater(String line, String[] versionArray) {
         String stringToReplace;
         String[] replacer;
         final String UDC_BUILD_NUMBER = "<UDC.BUILD.NUMBER>";
@@ -111,8 +112,8 @@ public class FileServiceImpl implements FilesService {
         int end = StringUtils.indexOf(line, "</");
         stringToReplace = line.substring(start, end);
         replacer = line.substring(start, end).split("\\.");
-        replacer[0]=versionArray[position];
-        line = line.replace(stringToReplace,String.join(".",replacer ));
+        replacer[0] = versionArray[position];
+        line = line.replace(stringToReplace, String.join(".", replacer));
 
         return line;
     }
@@ -132,40 +133,4 @@ public class FileServiceImpl implements FilesService {
             }
         return resultList;
     }
-
-    public void modifyVersion(String version, File file) {
-        BufferedReader reader = null;
-        FileWriter writer = null;
-        try {
-            reader = new BufferedReader(new FileReader(file));
-            String line = reader.readLine();
-            String oldContent = "";
-            while (line != null) {
-                if (line.contains(VERSION_STRING)) {
-                    String stringToReplace = line.substring(VERSION_STRING.length(), line.indexOf("\")"));
-                    line = line.replace(stringToReplace, version);
-                }
-
-                oldContent = oldContent.concat(line);
-                line = reader.readLine();
-                if (line != null) {
-                    oldContent = oldContent.concat(System.lineSeparator());
-                }
-            }
-            writer = new FileWriter(file);
-            writer.write(oldContent);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                //Closing the resources
-                if (reader != null) reader.close();
-                if (writer != null) writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
 }

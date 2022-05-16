@@ -14,5 +14,5 @@ public interface FilesService {
     void genereteSettings() throws  FileNotFoundException, JAXBException;
     void updateVersion(String path, String fileSetting, String fileToUpdate) throws JAXBException, IOException, XmlPullParserException;
     List<File> searchFiles(String path, String fileName);
-    void modifyVersion(String version, File file) throws IOException;
+    void modifyVersion(String version, File file, boolean isParentPom) throws IOException;
 }
