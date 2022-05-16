@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Built-By: leo
+Created-By: Apache Maven
+Class-Path: lib
+Main-Class: leo.main.Main
