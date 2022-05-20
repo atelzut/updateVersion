@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import services.FilesService;
 
 import static constants.Constants.*;
@@ -24,7 +23,7 @@ public class FileServiceImpl implements FilesService {
     @Override
     public boolean checkSettings() {
         File settings = new File(CURRENT_ROOT + PATH_SEPARATOR + SETTINGS_XML);
-        return settings.isFile();
+        return !settings.isFile();
     }
 
     @Override
@@ -37,10 +36,9 @@ public class FileServiceImpl implements FilesService {
     }
 
     @Override
-    public void updateVersion(String path, String fileSetting, String fileToUpdate) throws JAXBException, IOException, XmlPullParserException {
+    public void updateVersion(File settingsFile, String fileToUpdate) throws Exception {
 
-        XmlHelper xmlHelper = new XmlHelperImpl();
-        Settings settings = xmlHelper.fromXmlToJava(path, fileSetting);
+        Settings settings = getSettings(settingsFile);
         final File parentPom = new File(settings.getRoot() + PATH_SEPARATOR + "pom.xml");
         for (Modules module : settings.getModules()) {
             if (StringUtils.isNotEmpty(module.getModulename()))
@@ -66,7 +64,7 @@ public class FileServiceImpl implements FilesService {
             }
             writeToFile(file, versionUpdated);
         } catch (IOException e) {
-            LOG.info("error: "+ e.getMessage());
+            LOG.info("error: " + e.getMessage());
         }
     }
 
@@ -133,4 +131,18 @@ public class FileServiceImpl implements FilesService {
             }
         return resultList;
     }
+
+    @Override
+    public Settings getSettings(File fileSetting) throws Exception {
+        XmlHelper xmlHelper = new XmlHelperImpl();
+        Settings settings = xmlHelper.fromXmlToJava(fileSetting);
+        if (StringUtils.isEmpty(settings.getVersion())) {
+            throw new Exception("New version not set");
+        }
+        if (StringUtils.isEmpty(settings.getRoot())) {
+            throw new Exception("Root path not set");
+        }
+        return settings;
+    }
+
 }

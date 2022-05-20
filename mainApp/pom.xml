@@ -40,7 +40,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        leo.main.Main
+                                        leo.main.JarMain
                                     </mainClass>
                                 </manifest>
                             </archive>

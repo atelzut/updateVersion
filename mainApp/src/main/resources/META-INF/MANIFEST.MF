@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Built-By: leo
 Created-By: Apache Maven
-Main-Class: leo.main.Main
+Main-Class: leo.main.JarMain

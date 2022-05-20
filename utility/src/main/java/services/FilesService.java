@@ -1,7 +1,7 @@
 package services;
 
+import beans.Settings;
 import jakarta.xml.bind.JAXBException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,7 +12,8 @@ public interface FilesService {
 
     boolean checkSettings();
     void genereteSettings() throws  FileNotFoundException, JAXBException;
-    void updateVersion(String path, String fileSetting, String fileToUpdate) throws JAXBException, IOException, XmlPullParserException;
+    void updateVersion(File settingFile, String fileToUpdate) throws Exception;
     List<File> searchFiles(String path, String fileName);
     void modifyVersion(String version, File file, boolean isParentPom) throws IOException;
+    Settings getSettings (File inputFile) throws Exception;
 }

@@ -23,24 +23,21 @@ public class XmlHelperImpl implements XmlHelper {
         Marshaller marshallerObj = contextObj.createMarshaller();
         marshallerObj.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshallerObj.marshal(obj, new FileOutputStream(path + PATH_SEPARATOR + filename));
-
-
     }
 
     @Override
-    public Settings fromXmlToJava(String path, String filename) throws JAXBException {
+    public Settings fromXmlToJava(File inputFile) throws JAXBException {
         JAXBContext contextObj = org.eclipse.persistence.jaxb.JAXBContextFactory.createContext(new Class[]{Settings.class}, null);
-        File inputFile = new File(path + PATH_SEPARATOR + filename);
         Unmarshaller jaxbUnmarshaller = contextObj.createUnmarshaller();
         return (Settings) jaxbUnmarshaller.unmarshal(inputFile);
     }
 
     @Override
-    public void pomModifier(String baseDir, String version) throws IOException, XmlPullParserException {
+    public void pomModifier(File file, String version) throws IOException, XmlPullParserException {
 
 //Reading
         MavenXpp3Reader reader = new MavenXpp3Reader();
-        Model model = reader.read(new FileInputStream(new File(baseDir, "/pom.xml")));
+        Model model = reader.read(new FileInputStream(file));
 
 //Editing
         String[] versionArray = version.split("\\.");
@@ -50,7 +47,7 @@ public class XmlHelperImpl implements XmlHelper {
 
 //Writing
         MavenXpp3Writer writer = new MavenXpp3Writer();
-        writer.write(new FileOutputStream(new File(baseDir, "/pom.xml")), model);
+        writer.write(new FileOutputStream(file), model);
     }
 
 }
