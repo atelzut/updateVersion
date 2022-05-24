@@ -20,6 +20,7 @@ public class JarMain {
         if (filesService.checkSettings()) {
             try {
                 filesService.genereteSettings();
+                LOG.info("generated template for file settings");
             } catch (FileNotFoundException | JAXBException e) {
                 e.printStackTrace();
                 LOG.info(e.getMessage());
