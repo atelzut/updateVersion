@@ -2,6 +2,7 @@ package services.impl;
 
 import beans.Modules;
 import beans.Settings;
+import exceptions.MissingValueException;
 import helpers.XmlHelper;
 import helpers.impl.XmlHelperImpl;
 import jakarta.xml.bind.JAXBException;
@@ -36,7 +37,7 @@ public class FileServiceImpl implements FilesService {
     }
 
     @Override
-    public void updateVersion(File settingsFile, String fileToUpdate) throws Exception {
+    public void updateVersion(File settingsFile, String fileToUpdate) throws MissingValueException, JAXBException {
 
         Settings settings = getSettings(settingsFile);
         final File parentPom = new File(settings.getRoot() + PATH_SEPARATOR + "pom.xml");
@@ -133,14 +134,14 @@ public class FileServiceImpl implements FilesService {
     }
 
     @Override
-    public Settings getSettings(File fileSetting) throws Exception {
+    public Settings getSettings(File fileSetting) throws JAXBException, MissingValueException {
         XmlHelper xmlHelper = new XmlHelperImpl();
         Settings settings = xmlHelper.fromXmlToJava(fileSetting);
         if (StringUtils.isEmpty(settings.getVersion())) {
-            throw new Exception("New version not set");
+            throw new MissingValueException("New version not set");
         }
         if (StringUtils.isEmpty(settings.getRoot())) {
-            throw new Exception("Root path not set");
+            throw new MissingValueException("Root path not set");
         }
         return settings;
     }

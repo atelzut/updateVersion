@@ -1,6 +1,7 @@
 package services;
 
 import beans.Settings;
+import exceptions.MissingValueException;
 import jakarta.xml.bind.JAXBException;
 
 import java.io.File;
@@ -15,5 +16,5 @@ public interface FilesService {
     void updateVersion(File settingFile, String fileToUpdate) throws Exception;
     List<File> searchFiles(String path, String fileName);
     void modifyVersion(String version, File file, boolean isParentPom) throws IOException;
-    Settings getSettings (File inputFile) throws Exception;
+    Settings getSettings (File inputFile) throws MissingValueException, JAXBException;
 }
