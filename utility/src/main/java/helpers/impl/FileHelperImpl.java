@@ -1,10 +1,9 @@
-package services.impl;
+package helpers.impl;
 
 import beans.Modules;
 import beans.Settings;
 import exceptions.MissingValueException;
 import helpers.XmlHelper;
-import helpers.impl.XmlHelperImpl;
 import jakarta.xml.bind.JAXBException;
 
 import java.io.*;
@@ -13,13 +12,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
-import services.FilesService;
+import helpers.FilesHelper;
 
 import static constants.Constants.*;
 
-public class FileServiceImpl implements FilesService {
+public class FileHelperImpl implements FilesHelper {
 
-    private static final Logger LOG = Logger.getLogger(FileServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(FileHelperImpl.class.getName());
 
     @Override
     public boolean checkSettings() {
